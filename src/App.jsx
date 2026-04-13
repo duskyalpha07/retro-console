@@ -6,6 +6,7 @@ import RightControl from './components/RightControl';
 import Screen from './components/Screen';
 import useFetch from './hooks/useFetch';
 import GameScreen from './components/GameScreen';
+import PokemonInfo from './components/PokemonInfo';
 
 function App() {
   const url = 'https://pokeapi.co/api/v2/pokemon?limit=100&offset=0';
@@ -15,9 +16,26 @@ function App() {
   const getListPokemones = () => {
     const list = data?.results?.filter((p) => p.url);
     const plist = list?.map((l) => fetch(l.url).then((res) => res.json()));
+
     Promise.all(plist).then((values) => {
-      console.log('promesa values', values);
-      setPokemones(values);
+      const saniData = values?.map((e) => {
+        const randMoves = [...e.moves]
+        .sort(()=> 0.5 - Math.random())
+        .slice(0,4);
+
+        return {
+          name: e.name,
+          id: e.id,
+          types: e.types,
+          moves:randMoves.map((m) => ({
+            name: m.move.name,
+            attack: getRandomInt(10,25),
+          })),
+          sprites: e.sprites,
+        };
+      });
+
+      setPokemones(saniData);
     });
   };
 
@@ -71,10 +89,12 @@ const handleDirection = (direction) => {
   console.log(myPokeSelection.length);
   console.log(pcPokeSelection.length);
 
+  const currentPokemon = pokemones.find((p) => p.id === position);
 
 
-  return (
-    <div className="flex justify-center pt-10">
+ return (
+  <div className="flex flex-col justify-center pt-10">
+    <div className="flex justify-center">
       <LeftControl handleDirection={handleDirection}/>
       {myPokeSelection.length?(
         <GameScreen myPokemon={myPokeSelection[0]}pcPokemon={pcPokeSelection[0]}onBack={()=> setMyPokeSelection([])}/>
@@ -84,7 +104,10 @@ const handleDirection = (direction) => {
       )}
       <RightControl handleSelection={handleSelection}/>
     </div>
-  );
+    {!myPokeSelection.length && <PokemonInfo pokemon={currentPokemon} />}
+  </div>
+);
 }
+
 
 export default App;
