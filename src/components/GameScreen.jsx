@@ -4,7 +4,7 @@ function GameScreen({ myPokemon, pcPokemon, onBack }) {
   const [myHP, setMyHP] = useState(100);
   const [pcHP, setPcHP] = useState(100);
   const [turn, setTurn] = useState('player');
-  const [message, setMessage] = useState('Tu turno');
+  const [message, setMessage] = useState('Your turn');
 
   useEffect(() => {
     if (turn === 'pc' && pcHP > 0 && myHP > 0) {
@@ -13,7 +13,7 @@ function GameScreen({ myPokemon, pcPokemon, onBack }) {
         const damage = randomMove.attack;
 
         setMyHP((prev) => Math.max(0, prev - damage));
-        setMessage(`PC usó ${randomMove.name}`);
+        setMessage(`PC used ${randomMove.name}`);
         setTurn('player'); 
       }, 1500);
       return () => clearTimeout(timer);
@@ -25,10 +25,10 @@ function GameScreen({ myPokemon, pcPokemon, onBack }) {
 
     const damage = move.attack;
     setPcHP((prev) => Math.max(0, prev - damage));
-    setMessage(`Usaste ${move.name}!`);
+    setMessage(`You used ${move.name}!`);
     
     if (pcHP - damage <= 0) {
-      setMessage('¡Ganaste!');
+      setMessage('You won!');
     } else {
       setTurn('pc');
     }
@@ -39,7 +39,7 @@ function GameScreen({ myPokemon, pcPokemon, onBack }) {
       
       <div className="flex w-full justify-between items-center mb-4">
         <div className="flex flex-col items-center">
-          <h2 className="font-bold text-xs uppercase">Tu Pokémon</h2>
+          <h2 className="font-bold text-xs uppercase">My Pokémon</h2>
           <p className="capitalize italic">{myPokemon?.name}</p>
           <div className='bg-gray-200 w-24 rounded-full h-2.5 mb-1 mt-2'>
             <div 

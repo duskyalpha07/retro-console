@@ -18,7 +18,7 @@ function PokemonInfo({pokemon}){
                 <ul className="text-sm space-y-2 max-h-40 overflow-y-auto">
                 {pokemon.moves?.slice(0, 10).map((move, idx) => (
                     <li key={idx} className="capitalize bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition">
-                    <span className="font-semibold">{move.move?.name}</span> - <span>Attack: {move.attack}</span>
+                    <span className="font-semibold">{move.name}</span> - <span>Attack: {move.attack}</span>
                     </li>
                 ))}
                 </ul>
