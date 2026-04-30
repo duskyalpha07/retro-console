@@ -47,6 +47,7 @@ function App() {
 
   const [myPokeSelection, setMyPokeSelection] = useState([])
   const [pcPokeSelection, setPcPokeSelection] = useState([])
+  const isBattleActive = myPokeSelection.length > 0;
 
 const handleDirection = (direction) => {
   setPosition((prev) => {
@@ -102,7 +103,8 @@ const handleDirection = (direction) => {
       
       <Screen pokemones={pokemones} position={position}/>
       )}
-      <RightControl handleSelection={handleSelection}/>
+      <RightControl handleSelection={handleSelection}
+      isDisabled ={isBattleActive}/>
     </div>
     {!myPokeSelection.length && <PokemonInfo pokemon={currentPokemon} />}
   </div>

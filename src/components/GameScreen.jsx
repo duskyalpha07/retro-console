@@ -12,9 +12,16 @@ function GameScreen({ myPokemon, pcPokemon, onBack }) {
         const randomMove = pcPokemon.moves[Math.floor(Math.random() * pcPokemon.moves.length)];
         const damage = randomMove.attack;
 
-        setMyHP((prev) => Math.max(0, prev - damage));
-        setMessage(`PC used ${randomMove.name}`);
-        setTurn('player'); 
+          setMyHP((prev) => {
+        const newHP = Math.max(0, prev - damage);
+        if (newHP <= 0) {
+          setMessage(`Enemy used ${randomMove.name}. You lost!`);
+        } else {
+          setMessage(`Enemy used ${randomMove.name}`);
+          setTurn('player');
+        }
+        return newHP;
+      });
       }, 1500);
       return () => clearTimeout(timer);
     }
@@ -35,61 +42,58 @@ function GameScreen({ myPokemon, pcPokemon, onBack }) {
   }
 
   return (
-    <div className="relative w-[500px] min-h-[300px] border-4 border-slate-700 flex flex-col items-center p-4 bg-white rounded-xl">
-      
-      <div className="flex w-full justify-between items-center mb-4">
-        <div className="flex flex-col items-center">
-          <h2 className="font-bold text-xs uppercase">My Pokémon</h2>
-          <p className="capitalize italic">{myPokemon?.name}</p>
-          <div className='bg-gray-200 w-24 rounded-full h-2.5 mb-1 mt-2'>
-            <div 
-              className="bg-green-500 h-2.5 rounded-full transition-all duration-500" 
-              style={{ width: `${myHP}%` }}
-            ></div>
+    <div className="w-[450px] h-[300px] bg-gray-900 border-[8px] border-y-[12px] border-gray-900 flex flex-col items-center justify-center p-1 shadow-2xl relative">
+      <div className="w-full h-full bg-slate-800 rounded overflow-hidden flex flex-col items-center p-2 relative shadow-[inset_0_0_20px_rgba(0,0,0,0.8)] border-2 border-black">
+        <button 
+          onClick={onBack}
+          className="absolute top-2 left-2 text-white/50 hover:text-white text-[10px] font-bold uppercase z-20 transition-colors"
+        >
+          &lt; Back
+        </button>
+
+        <div className="flex w-full justify-between items-center mb-2 mt-4 px-4">
+          <div className="flex flex-col items-center z-10 w-1/3">
+            <h2 className="font-bold text-[10px] uppercase text-gray-400 tracking-wider">My Pokémon</h2>
+            <p className="capitalize italic text-white font-medium text-xs">{myPokemon?.name}</p>
+            <div className='bg-gray-900 w-full rounded-full h-1.5 mb-1 mt-1 border border-gray-700'>
+              <div 
+                className="bg-green-400 h-1.5 rounded-full transition-all duration-500 shadow-[0_0_5px_#4ade80]" 
+                style={{ width: `${myHP}%` }}
+              ></div>
+            </div>
+            <p className="text-[10px] text-gray-300">{myHP}/100 HP</p>
+            <img src={myPokemon?.sprites?.back_default} alt={myPokemon?.name} className="w-20 h-20 drop-shadow-md" style={{ imageRendering: 'pixelated' }} />
           </div>
-          <p className="text-sm text-red-600 font-bold">HP: {myHP}/100</p>
-          <img src={myPokemon?.sprites?.back_default} alt={myPokemon?.name} className="w-20 h-20" />
-        </div>
-
-        <div className="font-black text-gray-300">VS</div>
-
-        <div className="flex flex-col items-center">
-          <h2 className="font-bold text-xs uppercase">PC Pokémon</h2>
-          <p className="capitalize italic">{pcPokemon?.name}</p>
-          <div className='bg-gray-200 w-24 rounded-full h-2.5 mb-1 mt-2'>
-            <div 
-              className="bg-green-500 h-2.5 rounded-full transition-all duration-500" 
-              style={{ width: `${pcHP}%` }}
-            ></div>
+          <div className="font-black text-yellow-400 text-2xl italic opacity-80 z-0">VS</div>
+          <div className="flex flex-col items-center z-10 w-1/3">
+            <h2 className="font-bold text-[10px] uppercase text-gray-400 tracking-wider">Enemy</h2>
+            <p className="capitalize italic text-white font-medium text-xs">{pcPokemon?.name}</p>
+            <div className='bg-gray-900 w-full rounded-full h-1.5 mb-1 mt-1 border border-gray-700'>
+              <div 
+                className="bg-red-400 h-1.5 rounded-full transition-all duration-500 shadow-[0_0_5px_#f87171]" 
+                style={{ width: `${pcHP}%` }}
+              ></div>
+            </div>
+            <p className="text-[10px] text-gray-300">{pcHP}/100 HP</p>
+            <img src={pcPokemon?.sprites?.front_default} alt={pcPokemon?.name} className="w-20 h-20 drop-shadow-md" style={{ imageRendering: 'pixelated' }} />
           </div>
-          <p className="text-sm text-red-600 font-bold">HP: {pcHP}/100</p>
-          <img src={pcPokemon?.sprites?.front_default} alt={pcPokemon?.name} className="w-20 h-20" />
+        </div>
+        <p className="text-[10px] text-yellow-400/80 font-bold uppercase tracking-widest mb-2 mt-auto text-center w-full">
+          {message}
+        </p>
+        <div className='grid grid-cols-2 gap-2 w-[90%] mt-auto mb-2'>
+          {myPokemon?.moves?.map((move, index) => (
+            <button
+              key={index}
+              onClick={() => dealPlayerDmg(move)}
+              disabled={turn !== 'player' || myHP <= 0 || pcHP <= 0}
+              className='bg-blue-600 hover:bg-blue-500 active:bg-blue-700 disabled:bg-gray-700 disabled:text-gray-500 disabled:border-gray-800 text-white text-[10px] uppercase font-bold py-1.5 px-2 rounded border-b-4 border-blue-800 transition-all'
+            > 
+              {move.name} 
+            </button>
+          ))}
         </div>
       </div>
-
-      <div className="mb-4 text-center font-medium text-blue-800 bg-blue-50 px-4 py-1 rounded-full border border-blue-200">
-        {message}
-      </div>
-
-      <div className='grid grid-cols-2 gap-2 w-full'>
-        {myPokemon?.moves?.map((move, index) => (
-          <button
-            key={index}
-            onClick={() => dealPlayerDmg(move)}
-            disabled={turn !== 'player' || myHP <= 0 || pcHP <= 0}
-            className='bg-slate-800 hover:bg-slate-700 disabled:bg-gray-300 text-white text-[10px] uppercase font-bold py-2 px-2 rounded transition-all'
-          > 
-            {move.name} 
-          </button>
-        ))}
-      </div>
-
-      <button 
-        onClick={onBack}
-        className="mt-6 text-gray-400 hover:text-black text-xs font-bold uppercase tracking-widest"
-      >
-        Back
-      </button>
     </div>
   )
 }
